@@ -1,9 +1,8 @@
 {{- range $key, $spec := .Values }}
-{{- if ne $key "enabled" }}
-{{- if ne $key "istio-ingressgateway" }}
+{{- if eq $key "istio-ingressgateway" }}
 {{- if $spec.enabled }}
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: apps/v1
+kind: DaemonSet
 metadata:
   name: {{ $key }}
   namespace: {{ $spec.namespace | default $.Release.Namespace }}
@@ -15,7 +14,15 @@ metadata:
     {{ $key }}: {{ $val }}
     {{- end }}
 spec:
-  replicas: {{ $spec.replicaCount }}
+  selector:
+    matchLabels:
+        chart: {{ template "gateway.chart" $ }}
+        heritage: {{ $.Release.Service }}
+        release: {{ $.Release.Name }}
+        version: {{ $.Chart.Version }}
+        {{- range $key, $val := $spec.labels }}
+        {{ $key }}: {{ $val }}
+        {{- end }}
   template:
     metadata:
       labels:
@@ -189,10 +196,7 @@ spec:
           name: {{ .configMapName | quote }}
           optional: true
       {{- end }}
-      affinity:
-      {{- include "nodeaffinity" $ | indent 6 }}
 ---
-{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

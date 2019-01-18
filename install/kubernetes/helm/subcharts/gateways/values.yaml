@@ -12,9 +12,6 @@ istio-ingressgateway:
   labels:
     app: istio-ingressgateway
     istio: ingressgateway
-  replicaCount: 1
-  autoscaleMin: 1
-  autoscaleMax: 5
   resources: {}
     # limits:
     #  cpu: 100m
@@ -28,8 +25,8 @@ istio-ingressgateway:
   loadBalancerSourceRanges: []
   serviceAnnotations: {}
   podAnnotations: {}
-  type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
-  #externalTrafficPolicy: Local #change to Local to preserve source IP or Cluster for default behaviour or leave commented out
+  type: NodePort
+  externalTrafficPolicy: Local #change to Local to preserve source IP or Cluster for default behaviour or leave commented out
   ports:
     ## You can add custom gateway ports
   - port: 80
@@ -39,10 +36,6 @@ istio-ingressgateway:
   - port: 443
     name: https
     nodePort: 31390
-  # Example of a port to add. Remove if not needed
-  - port: 31400
-    name: tcp
-    nodePort: 31400
   ### PORTS FOR UI/metrics #####
   ## Disable if not needed
   - port: 15029
